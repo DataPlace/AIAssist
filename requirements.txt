@@ -1,0 +1,16 @@
+streamlit>=1.25
+pandas
+numpy
+scikit-learn
+PyPDF2
+pdfplumber
+python-docx
+python-multipart
+pillow
+requests
+python-dotenv
+sentence-transformers
+faiss-cpu
+tqdm
+ultralytics
+pyperclip

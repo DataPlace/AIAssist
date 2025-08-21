@@ -1,0 +1,10 @@
+# Env + secrets
+.env
+.streamlit/secrets.toml
+
+# Bytecode
+__pycache__/
+*.pyc
+
+# Data & indices (optional)
+data/
