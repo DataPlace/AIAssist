@@ -278,7 +278,7 @@ elif page == "Object Detection":
         st.error(f"Required packages not available: {e}")
         st.info("Install: pip install ultralytics pillow")
     else:
-        model_size = st.selectbox("Model", ["yolov8n.pt", "yolov8s.pt", "yolov8m.pt"], index=0)
+        model_size = st.selectbox("Model", ["yolov8n.pt"], index=0)
         uploaded_image = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
         if uploaded_image:
             tmp_path = None

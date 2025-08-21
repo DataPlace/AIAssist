@@ -1,29 +1,28 @@
-# modules/detector.py
+# detector.py
 from ultralytics import YOLO
-import streamlit as st
-from PIL import Image
-import io
+from PIL import Image, ImageOps
 import numpy as np
+from collections import Counter
+from io import BytesIO
 
-@st.cache_resource
-def load_model(model_name: str = "yolov8n") -> YOLO:
-    model = YOLO(model_name)
-    return model
+def run_detection(uploaded_file, model_path="yolov8n.pt"):
+    # Load YOLO once (you can optimize by caching globally if needed)
+    model = YOLO(model_path)
 
-def detect_from_bytes(image_bytes: bytes, model: YOLO, conf: float = 0.25):
-    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    results = model.predict(img, conf=conf, imgsz=640)
-    r = results[0]
-    annotated = r.plot()
-    detections = []
-    if hasattr(r, "boxes"):
-        for box in r.boxes:
-            try:
-                cls = int(box.cls[0].item())
-                name = r.names.get(cls, str(cls))
-                confscore = float(box.conf[0].item())
-                xyxy = box.xyxy[0].tolist()
-                detections.append({"class_id": cls, "label": name, "score": confscore, "xyxy": xyxy})
-            except Exception:
-                continue
-    return annotated, detections
+    # Read bytes -> PIL
+    raw_bytes = uploaded_file.read()
+    img = Image.open(BytesIO(raw_bytes))
+    img = ImageOps.exif_transpose(img)
+    img = img.convert("RGB")
+
+    # Run detection
+    results = model(np.array(img))
+
+    summary = {}
+    annotated_img = None
+    for r in results:
+        annotated_img = Image.fromarray(r.plot())
+        labels = [r.names[int(c)] for c in r.boxes.cls] if r.boxes is not None else []
+        summary = dict(Counter(labels))
+
+    return results, annotated_img, summary
